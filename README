@@ -1,0 +1,19 @@
+This is a collection of ubenchmarks that has been optimized for performance for different architectures.
+
+The list of benchmarks are
+1) intensity
+2) L1 cache
+3) L2 cache
+4) random access
+
+The list of target systems are
+1) CPU (Nehalem)
+2) CPU (Ivy Bridge)
+3) GPU (HD4000)
+4) GPU (Fermi)
+5) GPU (Kepler)
+6) ARM (Cortex A9)
+7) ARM (Cortex A15)
+8) GPU (Mali T604)
+9) CPU (AMD)
+10) GPU (Radeon)
