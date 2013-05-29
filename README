@@ -17,3 +17,5 @@ The list of target systems are
 8) GPU (Mali T604)
 9) CPU (AMD)
 10) GPU (Radeon)
+
+To compile the ubenchmarks do the following:
