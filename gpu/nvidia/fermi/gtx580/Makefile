@@ -73,12 +73,11 @@ bandwidthIlp: $(BANDWIDTHILP_OBJECTS)
 # ===========================================================================
 
 # ===========================================================================
-INTENSITYDBL_SOURCES = jeemaxbench.cu intensity_kernel.cu
-INTENSITYDBL_SOURCES = jeemaxbench.cu py.intensity_kernel.cu
-INTENSITYDBL_OBJECTS = $(INTENSITYDBL_SOURCES:.cu=.o)
+INTENSITY_SOURCES = jeemaxbench.cu py.intensity_kernel.cu
+INTENSITY_OBJECTS = $(INTENSITY_SOURCES:.cu=.o)
 
-intensityDbl: $(INTENSITYDBL_OBJECTS)
-	$(NVCC) $(NVCCLIBS) $(INTENSITYDBL_OBJECTS) -o $@
+intensity: $(INTENSITY_OBJECTS)
+	$(NVCC) $(NVCCLIBS) $(INTENSITY_OBJECTS) -o $@
 # ===========================================================================
 
 

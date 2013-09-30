@@ -6,9 +6,9 @@ Each instruction executes N/2 FMAs.
 %========================================
 Compute benchmark
 	Single:
-		make computeIlp TYPE=float
+		make compute TYPE=float
 	Double:
-		make computeIlp TYPE=double
+		make compute TYPE=double
 %========================================
 
 
@@ -25,7 +25,7 @@ Bandwidth benchmark
 %========================================
 Intensity benchmark
 	Single:
-		make intensityIlp TYPE=float4
+		make intensity TYPE=float
 	Double:
-		make intensityDbl TYPE=double
+		make intensity TYPE=double
 %========================================
