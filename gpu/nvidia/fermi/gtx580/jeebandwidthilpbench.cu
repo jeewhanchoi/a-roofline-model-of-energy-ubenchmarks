@@ -34,7 +34,7 @@ float runTest(int num_threads, int block_size, int num_streams)
 	cudaEvent_t start, stop;
 	float total_time_taken;
 
-	if((num_blocks <= 2147483647) && 
+	if((num_blocks <= 65535) && 
 		 (((num_threads / 1024) * num_streams * sizeof (TYPE)) < (7e5))) {
 		fprintf(stderr, "Execution configuration: %d blocks %d threads %d streams\t"
 						, num_blocks, block_size, num_streams);

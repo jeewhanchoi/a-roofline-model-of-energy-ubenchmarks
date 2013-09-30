@@ -13,7 +13,7 @@ INCLUDES += -I$(CUDA_INSTALL_PATH)/include -I$(CUDA_SDK_INSTALL_PATH)/C/common/i
 # Flags
 # Set the appropriate flags for the given architecture (compute_XX) and 
 # 	code (sm_XX)
-NVCCFLAGS += -gencode arch=compute_35,code=sm_35 --ptxas-options=-v 
+NVCCFLAGS += -gencode arch=compute_20,code=sm_20 --ptxas-options=-v 
 
 
 # Libraries
