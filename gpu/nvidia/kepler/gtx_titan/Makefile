@@ -82,7 +82,6 @@ intensityIlp: $(INTENSITYILP_OBJECTS)
 # ===========================================================================
 
 # ===========================================================================
-INTENSITYDBL_SOURCES = jeemaxbench.cu intensity_kernel.cu
 INTENSITYDBL_SOURCES = jeemaxbench.cu py.intensity_kernel.cu
 INTENSITYDBL_OBJECTS = $(INTENSITYDBL_SOURCES:.cu=.o)
 

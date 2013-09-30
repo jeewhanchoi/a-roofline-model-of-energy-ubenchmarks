@@ -1,8 +1,9 @@
 How to compile:
 
 %========================================
-This benchmark uses two independent instructions per thread.
-Each instruction executes N/2 FMAs.
+	This benchmark uses two independent 
+instructions per thread.
+	Each instruction executes N/2 FMAs.
 %========================================
 Compute benchmark
 	Single:
@@ -13,8 +14,9 @@ Compute benchmark
 
 
 %========================================
-N threads copies n pieces of data each in strides of N.
-Each data is float4.
+	N threads copies n pieces of data each 
+in strides of N.
+	Each data is float4.
 %========================================
 Bandwidth benchmark
 	make bandwidthIlp TYPE=float4
@@ -22,6 +24,11 @@ Bandwidth benchmark
 
 
 %========================================
+	This benchmark has one (Double) or 
+two (Single) ILP per thread (Single).
+	It computes a sequence of FMA's over
+each word of data loaded to match the 
+input intensity I.
 %========================================
 Intensity benchmark
 	Single:
