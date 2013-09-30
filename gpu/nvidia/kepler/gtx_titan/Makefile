@@ -36,9 +36,9 @@ NVCCLIBS += -L$(CUDA_INSTALL_PATH)/lib64 $(CUDALIB) -L$(CUDA_SDK_INSTALL_PATH)/C
 TARGETS += computeIlp
 TARGETS += bandwidthIlp
 TARGETS += intensityIlp
-TARGETS += cachetest
-TARGETS += smtest
-TARGETS += gpurand
+#TARGETS += cachetest
+#TARGETS += smtest
+#TARGETS += gpurand
 
 
 # default data type is double-precision (double)

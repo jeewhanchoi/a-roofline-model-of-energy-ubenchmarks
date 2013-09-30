@@ -2,7 +2,7 @@ How to compile:
 
 %========================================
 This benchmark uses two independent instructions per thread.
-Each instruction executes n/2 FMAs.
+Each instruction executes N/2 FMAs.
 %========================================
 Compute benchmark
 	Single:
@@ -11,10 +11,20 @@ Compute benchmark
 		make computeIlp TYPE=double
 %========================================
 
+
 %========================================
 N threads copies n pieces of data each in strides of N.
 Each data is float4.
 %========================================
 Bandwidth benchmark
 	make bandwidthIlp TYPE=float4
+%========================================
+
+
+%========================================
+%========================================
+Intensity benchmark
+	Single:
+		make intensityIlp TYPE=float4
+	Double:
 %========================================
