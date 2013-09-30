@@ -36,6 +36,7 @@ NVCCLIBS += -L$(CUDA_INSTALL_PATH)/lib64 $(CUDALIB) -L$(CUDA_SDK_INSTALL_PATH)/C
 TARGETS += computeIlp
 TARGETS += bandwidthIlp
 TARGETS += intensityIlp
+TARGETS += intensityDbl
 #TARGETS += cachetest
 #TARGETS += smtest
 #TARGETS += gpurand
@@ -80,6 +81,14 @@ intensityIlp: $(INTENSITYILP_OBJECTS)
 	$(NVCC) $(NVCCLIBS) $(INTENSITYILP_OBJECTS) -o $@ 
 # ===========================================================================
 
+# ===========================================================================
+INTENSITYDBL_SOURCES = jeemaxbench.cu intensity_kernel.cu
+INTENSITYDBL_SOURCES = jeemaxbench.cu py.intensity_kernel.cu
+INTENSITYDBL_OBJECTS = $(INTENSITYDBL_SOURCES:.cu=.o)
+
+intensityDbl: $(INTENSITYDBL_OBJECTS)
+	$(NVCC) $(NVCCLIBS) $(INTENSITYDBL_OBJECTS) -o $@
+# ===========================================================================
 
 
 

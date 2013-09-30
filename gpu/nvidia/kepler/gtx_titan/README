@@ -27,4 +27,5 @@ Intensity benchmark
 	Single:
 		make intensityIlp TYPE=float4
 	Double:
+		make intensityDbl TYPE=double
 %========================================
