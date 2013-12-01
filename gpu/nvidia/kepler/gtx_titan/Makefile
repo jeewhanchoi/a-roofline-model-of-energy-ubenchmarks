@@ -1,5 +1,5 @@
 # CUDA Install Path 
-CUDA_INSTALL_PATH ?= /usr/local/cuda-5.0
+CUDA_INSTALL_PATH ?= /usr/local/cuda-5.5
 
 # CUDA SDK Install Path
 CUDA_SDK_INSTALL_PATH ?= $(HOME)/NVIDIA_GPU_Computing_SDK
