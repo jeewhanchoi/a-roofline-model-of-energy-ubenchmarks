@@ -14,68 +14,186 @@
 
 #define PROCESS_BY_4_ELEMENTS
 
-// const size_t array_size = 1024*1024*16;
 size_t array_size;
 
 float *hostData = NULL;
 float *hostData_ = NULL;
+
 cl_device_id device = NULL;
 cl_uint numDevices = 0;
 cl_platform_id platform = NULL;
 cl_command_queue commandQueue = NULL;
 cl_context ctx = NULL;
+
 cl_mem inputBuffer = NULL;
 cl_mem inputBuffer_ = NULL;
 cl_mem outputBuffer = NULL;
 cl_mem outputBuffer_ = NULL;
+
 cl_kernel kernel = NULL;
 cl_program program = NULL;
 
+/* ============================================================ */
+/* Initialize the data structure on the host side */
 void initHost() {
-	::hostData = (cl_float*)malloc(sizeof(cl_float)*array_size);
-	// ::hostData_ = (cl_float*)malloc(sizeof(cl_float)*array_size/4);
+	::hostData = (cl_float*) malloc (sizeof (cl_float) * array_size);
 
 	for (size_t i = 0; i < array_size; i++) {
-		hostData[i] = float(i);
+		hostData[i] = float (i);
 	}
-	/*	
-	for (size_t i = 0; i < array_size/4; i++) {
-		hostData[i] = float(i);
-	}
-	 */
-
 }
+/* ============================================================ */
 
+/* ============================================================ */
+/* Initialize the GPU platform */
 void initCLPlatform() {
 	cl_int status;
 	cl_uint numberOfPlatforms;
 
-
+	/* get the number of OpenCL platforms and their types */
 	status = clGetPlatformIDs(1, &platform, &numberOfPlatforms);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clGetPlatformIDs failed with error: %d\n", status);
 		exit(status);
 	}
 
+	/* get device IDs for the platforms found */
 	status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &numDevices);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clGetDeviceIDs failed with error %d\n", status);
 		exit(status);
 	}
 
+	/* create an openCl context */
 	::ctx = clCreateContext(0, 1, &::device, NULL, NULL, &status);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clCreateContext failed with error %d\n", status);
 		exit(status);
 	}
 
+	/* create a command queue */
 	::commandQueue = clCreateCommandQueue(::ctx, ::device, CL_QUEUE_PROFILING_ENABLE, &status);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clCreateCommandQueue failed with error %d\n", status);
 		exit(status);
 	}
-
 }
+/* ============================================================ */
+
+/* ============================================================ */
+/* Allocate device data */
+void initCLBuffer() {
+	cl_int status;
+
+	/* input array */
+	::inputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) * array_size, NULL, &status);
+	if (status != CL_SUCCESS) {
+		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
+		exit(status);
+	}
+
+	/* output array */
+	::outputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) * array_size, NULL, &status);
+	if (status != CL_SUCCESS) {
+		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
+		exit(status);
+	}
+}
+/* ============================================================ */
+
+/* ============================================================ */
+/* Create and build the kernel */
+void initCLKernel(int multiplyAdds) {
+	cl_int status;
+
+	/* Kernel source code */
+	std::string source = 
+	"__kernel void CLBench(__global float *input, __global float *output) {\n"
+	"	uint id = get_global_id(0);\n"
+#if defined(PROCESS_BY_16_ELEMENTS)
+	"	float16 y = 0.0f;\n"
+	"	float16 x = vload16(id, input);\n";
+#elif defined(PROCESS_BY_8_ELEMENTS)
+	"	float8 y = 0.0f;\n"
+	"	float8 x = vload8(id, input);\n";
+#elif defined(PROCESS_BY_4_ELEMENTS)
+	"	float4 y = 0.0f;\n"
+	"	float y_ = 0.0f;\n"
+	"	float4 x = vload4(id, input);\n"
+	"	float x_ = x.x * x.x;\n";
+#elif defined(PROCESS_BY_2_ELEMENTS)
+	"	float2 y = 0.0f;\n"
+	"	float2 x = vload2(id, input);\n";
+#else
+	"	float y = 0.0f;\n"
+	"	float x = input[id];\n";
+#endif
+	for (int i = 0; i < multiplyAdds; i++) {
+#if defined(PROCESS_BY_16_ELEMENTS)
+		source.append("	y = mad(x, x, y);\n");
+#elif defined(PROCESS_BY_8_ELEMENTS)
+		source.append("	y = mad(x, x, y);\n");
+#elif defined(PROCESS_BY_4_ELEMENTS)
+		source.append("	y = mad(x, x, y);\n");
+		source.append("	y_ = mad(x_, x_, y_);\n");
+#elif defined(PROCESS_BY_2_ELEMENTS)
+		source.append("	y = mad(x, x, y);\n");
+#else
+		source.append("	y = mad(x, x, y);\n");
+#endif
+	}
+#if defined(PROCESS_BY_16_ELEMENTS)
+	source.append("	vstore16(y, id, output);\n");
+#elif defined(PROCESS_BY_8_ELEMENTS)
+	source.append("	vstore8(y, id, output);\n");
+#elif defined(PROCESS_BY_4_ELEMENTS)
+	source.append("	y.x = y.x + y_;\n");
+	source.append("	vstore4(y, id, output);\n");
+#elif defined(PROCESS_BY_2_ELEMENTS)
+	source.append("	vstore2(y, id, output);\n");
+#else
+	source.append("	output[id] = y;\n");
+#endif
+	source.append("}\n\n");
+
+	/* create a program using the source string */
+	const char* sourceBuffer = source.c_str();
+	::program = clCreateProgramWithSource(::ctx, 1, &sourceBuffer, NULL, &status);
+	if (status != CL_SUCCESS) {
+		fprintf(stderr, "clCreateProgramWithSource failed with error %d\n", status);
+		exit(status);
+	}
+
+	/* compile the program */
+	status = clBuildProgram(::program, 0, NULL, "-cl-fast-relaxed-math -cl-mad-enable", NULL, NULL);
+	if (status != CL_SUCCESS) {
+		fprintf(stderr, "clBuildProgram failed with error %d %d\n", status, CL_BUILD_PROGRAM_FAILURE);
+
+		exit(status);
+	}
+
+	::kernel = clCreateKernel(::program, "CLBench", &status);
+	if (status != CL_SUCCESS) {
+		fprintf(stderr, "clCreateKernel failed with error %d\n", status);
+		exit(status);
+	}
+}
+/* ============================================================ */
+
+/* ============================================================ */
+/* Free up allocated memory */
+void cleanupCL() {
+	free(hostData);
+
+	clReleaseMemObject(::inputBuffer);
+	clReleaseMemObject(::outputBuffer);
+	clReleaseKernel(::kernel);
+	clReleaseProgram(::program);
+	clReleaseCommandQueue(::commandQueue);
+	clReleaseContext(::ctx);
+}
+/* ============================================================ */
+
 
 void initCLPlatform__() {
 	cl_int status;
@@ -397,132 +515,19 @@ void initCLPlatform__() {
 	}
 }
 
-void initCLBuffer() {
-	cl_int status;
 
-	::inputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) * array_size, NULL, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
-		exit(status);
-	}
-
-	/*
-	::inputBuffer_ = clCreateBuffer(::ctx, CL_MEM_READ_ONLY, sizeof(cl_float) * array_size/4, NULL, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
-		exit(status);
-	}
-	 */
-
-	::outputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) * array_size, NULL, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
-		exit(status);
-	}
-
-	/*
-	::outputBuffer_ = clCreateBuffer(::ctx, CL_MEM_WRITE_ONLY, sizeof(cl_float) * array_size/4, NULL, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
-		exit(status);
-	}
-	 */
-}
-
-void initCLKernel(int multiplyAdds) {
-	cl_int status;
-
-	std::string source = "__kernel void CLBench(__global float *input, __global float *output) {\n"
-	                     "	uint id = get_global_id(0);\n"
-#if defined(PROCESS_BY_16_ELEMENTS)
-	                     "	float16 y = 0.0f;\n"
-	                     "	float16 x = vload16(id, input);\n";
-#elif defined(PROCESS_BY_8_ELEMENTS)
-	                     "	float8 y = 0.0f;\n"
-	                     "	float8 x = vload8(id, input);\n";
-#elif defined(PROCESS_BY_4_ELEMENTS)
-	                     "	float4 y = 0.0f;\n"
-	                     "	float y_ = 0.0f;\n"
-	                     "	float4 x = vload4(id, input);\n"
-	                     "	float x_ = x.x * x.x;\n";
-	                     // "	float x_ = input_[id];\n";
-#elif defined(PROCESS_BY_2_ELEMENTS)
-	                     "	float2 y = 0.0f;\n"
-	                     "	float2 x = vload2(id, input);\n";
-#else
-	                     "	float y = 0.0f;\n"
-	                     "	float x = input[id];\n";
-#endif
-	for (int i = 0; i < multiplyAdds; i++) {
-#if defined(PROCESS_BY_16_ELEMENTS)
-		source.append("	y = mad(x, x, y);\n");
-#elif defined(PROCESS_BY_8_ELEMENTS)
-		source.append("	y = mad(x, x, y);\n");
-#elif defined(PROCESS_BY_4_ELEMENTS)
-		source.append("	y = mad(x, x, y);\n");
-		source.append("	y_ = mad(x_, x_, y_);\n");
-#elif defined(PROCESS_BY_2_ELEMENTS)
-		source.append("	y = mad(x, x, y);\n");
-#else
-		source.append("	y = mad(x, x, y);\n");
-#endif
-	}
-#if defined(PROCESS_BY_16_ELEMENTS)
-	source.append("	vstore16(y, id, output);\n");
-#elif defined(PROCESS_BY_8_ELEMENTS)
-	source.append("	vstore8(y, id, output);\n");
-#elif defined(PROCESS_BY_4_ELEMENTS)
-	source.append("	y.x = y.x + y_;\n");
-	source.append("	vstore4(y, id, output);\n");
-	// source.append("	output_[id] = y_;\n");
-#elif defined(PROCESS_BY_2_ELEMENTS)
-	source.append("	vstore2(y, id, output);\n");
-#else
-	source.append("	output[id] = y;\n");
-#endif
-	source.append("}\n\n");
-
-	/* This is UB, may crash on the next line */
-	const char* sourceBuffer = source.c_str();
-	// fprintf (stderr, "%s", sourceBuffer);
-	::program = clCreateProgramWithSource(::ctx, 1, &sourceBuffer, NULL, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateProgramWithSource failed with error %d\n", status);
-		exit(status);
-	}
-
-	status = clBuildProgram(::program, 0, NULL, "-cl-fast-relaxed-math -cl-mad-enable", NULL, NULL);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clBuildProgram failed with error %d %d\n", status, CL_BUILD_PROGRAM_FAILURE);
-
-		exit(status);
-	}
-
-	::kernel = clCreateKernel(::program, "CLBench", &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateKernel failed with error %d\n", status);
-		exit(status);
-	}
-}
-
+/* Execute the kernel */
 void runCL(int multiplyAdds) {
 	cl_int status;
 	cl_event writeEvent;
 	cl_event computeEvent;
 
+	/* Set input arguments to the kernel */
 	status = clSetKernelArg(::kernel, 0, sizeof(cl_mem), &inputBuffer);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clSetKernelArg failed with error %d\n", status);
 		exit(status);
 	}
-
-	/*
-	status = clSetKernelArg(::kernel, 1, sizeof(cl_mem), &inputBuffer_);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clSetKernelArg failed with error %d\n", status);
-		exit(status);
-	}
-	 */
 
 	status = clSetKernelArg(::kernel, 1, sizeof(cl_mem), &outputBuffer);
 	if (status != CL_SUCCESS) {
@@ -530,14 +535,9 @@ void runCL(int multiplyAdds) {
 		exit(status);
 	}
 
-	/*
-	status = clSetKernelArg(::kernel, 3, sizeof(cl_mem), &outputBuffer_);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clSetKernelArg failed with error %d\n", status);
-		exit(status);
-	}
-	 */
 
+	/* Copy the data over to the device -- the command is only queued, not
+		 executed */
 	status = clEnqueueWriteBuffer(::commandQueue, inputBuffer, CL_FALSE, 0, sizeof(cl_float) * array_size, hostData, 0, NULL, &writeEvent);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clEnqueueWriteBuffer failed with error %d\n", status);
@@ -545,63 +545,43 @@ void runCL(int multiplyAdds) {
 	}
 
 
-	/*
-	status = clEnqueueWriteBuffer(::commandQueue, inputBuffer_, CL_FALSE, 0, sizeof(cl_float) * array_size/4, hostData_, 0, NULL, &writeEvent);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clEnqueueWriteBuffer failed with error %d\n", status);
-		exit(status);
-	}
-	 */
 
-	//~ for (int i = 0; i < 3; i++) {
-		//~ status = clEnqueueNDRangeKernel(::commandQueue, ::kernel, 1, 0, globalWorkSize, NULL, 1, &writeEvent, NULL);
-		//~ if (status != CL_SUCCESS) {
-			//~ fprintf(stderr, "clEnqueueNDRangeKernel failed with error %d\n", status);
-			//~ exit(status);
-		//~ }
-	//~ }
-
-	// transfer data
-	// clFlush(::commandQueue);
+	/* Transfer data */
+	/* clFinish is used instead of clFlush in order to make sure data copy
+		 is completed before the time measurement begins */
 	clFinish(::commandQueue);
 
-	sleep (2);
 #if defined(PROCESS_BY_16_ELEMENTS)
 	size_t globalWorkSize[3] = {array_size / 16, 0, 0};
 #elif defined(PROCESS_BY_8_ELEMENTS)
 	size_t globalWorkSize[3] = {array_size / 8, 0, 0};
 #elif defined(PROCESS_BY_4_ELEMENTS)
 	size_t globalWorkSize[3] = {array_size / 4, 0, 0};
-	size_t localWorkSize[3] = {256, 0, 0};
 #elif defined(PROCESS_BY_2_ELEMENTS)
 	size_t globalWorkSize[3] = {array_size / 2, 0, 0};
 #else
 	size_t globalWorkSize[3] = {array_size, 0, 0};
 #endif
-
-	/*
 	status = clEnqueueNDRangeKernel(::commandQueue, ::kernel, 1, 0, globalWorkSize, NULL, 1, &writeEvent, &computeEvent);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clEnqueueNDRangeKernel failed with error %d %d\n", status, CL_OUT_OF_RESOURCES);
 		exit(status);
 	}
-	 */
-	status = clEnqueueNDRangeKernel(::commandQueue, ::kernel, 1, 0, globalWorkSize, localWorkSize, 1, &writeEvent, &computeEvent);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clEnqueueNDRangeKernel failed with error %d %d\n", status, CL_OUT_OF_RESOURCES);
-		exit(status);
-	}
 
-	
+	/* Create and initialize timer */
 	struct stopwatch_t * timer = NULL;
 	long double t_start, t_end;
 
 	stopwatch_init ();
 	timer = stopwatch_create ();
+
+	/* Start timer */
 	stopwatch_start (timer);
-	// execute kernel
-	// clFlush(::commandQueue);
+
+	/* Execute queued kernel */
 	clFinish(::commandQueue);
+
+	/* Stop timer */
 	t_end = stopwatch_elapsed (timer);
 	fprintf (stderr, "Execution time: %Lg secs\n", t_end);
 
@@ -683,19 +663,10 @@ void verify(int multiplyAdds) {
 	free(hostOutput);
 }
 
-void cleanupCL() {
-	free(hostData);
-
-	clReleaseMemObject(::inputBuffer);
-	clReleaseMemObject(::outputBuffer);
-	clReleaseKernel(::kernel);
-	clReleaseProgram(::program);
-	clReleaseCommandQueue(::commandQueue);
-	clReleaseContext(::ctx);
-}
 
 int main(int argc, char** argv) {
 
+	/* number of multiply adds per word of data */
 	int multiplyAdds;
 
 	if(argc != 3) {
@@ -708,16 +679,22 @@ int main(int argc, char** argv) {
 
 	// initialize array
 	initHost();
+
 	// initialize the device
 	initCLPlatform();
+
 	// allocate device memory
 	initCLBuffer();
+
 	// create and build kernel
 	initCLKernel(multiplyAdds);
+
 	// run the kernel
 	runCL(multiplyAdds);
+
 	// verify results
 	verify(multiplyAdds);
+
 	// free memory
 	cleanupCL();
 
