@@ -58,7 +58,8 @@ void initCLPlatform() {
 	}
 
 	/* get device IDs for the platforms found */
-	status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &numDevices);
+	status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, 
+													&numDevices);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clGetDeviceIDs failed with error %d\n", status);
 		exit(status);
@@ -72,7 +73,8 @@ void initCLPlatform() {
 	}
 
 	/* create a command queue */
-	::commandQueue = clCreateCommandQueue(::ctx, ::device, CL_QUEUE_PROFILING_ENABLE, &status);
+	::commandQueue = clCreateCommandQueue(::ctx, ::device, 
+																				CL_QUEUE_PROFILING_ENABLE, &status);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clCreateCommandQueue failed with error %d\n", status);
 		exit(status);
@@ -86,14 +88,16 @@ void initCLBuffer() {
 	cl_int status;
 
 	/* input array */
-	::inputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) * array_size, NULL, &status);
+	::inputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) 
+																 * array_size, NULL, &status);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
 		exit(status);
 	}
 
 	/* output array */
-	::outputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float) * array_size, NULL, &status);
+	::outputBuffer = clCreateBuffer(::ctx, CL_MEM_READ_WRITE, sizeof(cl_float)
+																	* array_size, NULL, &status);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clCreateBuffer failed with error %d\n", status);
 		exit(status);
@@ -158,16 +162,21 @@ void initCLKernel(int multiplyAdds) {
 
 	/* create a program using the source string */
 	const char* sourceBuffer = source.c_str();
-	::program = clCreateProgramWithSource(::ctx, 1, &sourceBuffer, NULL, &status);
+	::program = clCreateProgramWithSource(::ctx, 1, &sourceBuffer, NULL, 
+																				&status);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateProgramWithSource failed with error %d\n", status);
+		fprintf(stderr, "clCreateProgramWithSource failed with error %d\n", 
+						status);
 		exit(status);
 	}
 
 	/* compile the program */
-	status = clBuildProgram(::program, 0, NULL, "-cl-fast-relaxed-math -cl-mad-enable", NULL, NULL);
+	status = clBuildProgram(::program, 0, NULL, 
+													"-cl-fast-relaxed-math -cl-mad-enable", NULL, 
+													NULL);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clBuildProgram failed with error %d %d\n", status, CL_BUILD_PROGRAM_FAILURE);
+		fprintf(stderr, "clBuildProgram failed with error %d %d\n", status, 
+						CL_BUILD_PROGRAM_FAILURE);
 
 		exit(status);
 	}
@@ -181,341 +190,6 @@ void initCLKernel(int multiplyAdds) {
 /* ============================================================ */
 
 /* ============================================================ */
-/* Free up allocated memory */
-void cleanupCL() {
-	free(hostData);
-
-	clReleaseMemObject(::inputBuffer);
-	clReleaseMemObject(::outputBuffer);
-	clReleaseKernel(::kernel);
-	clReleaseProgram(::program);
-	clReleaseCommandQueue(::commandQueue);
-	clReleaseContext(::ctx);
-}
-/* ============================================================ */
-
-
-void initCLPlatform__() {
-	cl_int status;
-	cl_uint numberOfPlatforms;
-
-	status = clGetPlatformIDs(1, &platform, &numberOfPlatforms);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetPlatformIDs failed with error: %d\n", status);
-		exit(status);
-	}
-
-	const size_t platformProfileMax = 1024;
-	char platformProfile[platformProfileMax];
-	status = clGetPlatformInfo(platform, CL_PLATFORM_PROFILE, platformProfileMax, platformProfile, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetPlatformInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_PLATFORM_PROFILE: %s\n", platformProfile);
-	}
-
-	const size_t platformVersionMax = 1024;
-	char platformVersion[platformVersionMax];
-	status = clGetPlatformInfo(platform, CL_PLATFORM_VERSION, platformVersionMax, platformVersion, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetPlatformInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_PLATFORM_VERSION: %s\n", platformVersion);
-	}
-
-	const size_t platformVendorMax = 1024;
-	char platformVendor[platformVendorMax];
-	status = clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, platformVendorMax, platformVendor, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetPlatformInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_PLATFORM_VENDOR: %s\n", platformVendor);
-	}
-
-	const size_t platformNameMax = 1024;
-	char platformName[platformNameMax];
-	status = clGetPlatformInfo(platform, CL_PLATFORM_NAME, platformNameMax, platformName, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetPlatformInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_PLATFORM_NAME: %s\n", platformName);
-	}
-
-	const size_t platformExtensionsMax = 1024;
-	char platformExtensions[platformExtensionsMax];
-	status = clGetPlatformInfo(platform, CL_PLATFORM_EXTENSIONS, platformExtensionsMax, platformExtensions, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetPlatformInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_PLATFORM_EXTENSIONS: %s\n", platformExtensions);
-	}
-
-	status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &numDevices);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceIDs failed with error %d\n", status);
-		exit(status);
-	}
-
-	printf("\n");
-
-	const size_t deviceNameMax = 1024;
-	char deviceName[deviceNameMax];
-	status = clGetDeviceInfo(device, CL_DEVICE_NAME, deviceNameMax, deviceName, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_NAME: %s\n", deviceName);
-	}
-
-	const size_t extensionsMax = 4096;
-	char extensions[extensionsMax];
-	status = clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, extensionsMax, extensions, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_EXTENSIONS: %s\n", extensions);
-	}
-
-	cl_bool compilerAvailable;
-	status = clGetDeviceInfo(device, CL_DEVICE_COMPILER_AVAILABLE, sizeof(cl_bool), &compilerAvailable, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_COMPILER_AVAILABLE: %s\n", (compilerAvailable == CL_TRUE) ? "CL_TRUE" : "CL_FALSE");
-	}
-
-	const size_t deviceOpenCLCVersionMax = 1024;
-	char deviceOpenCLCVersion[deviceOpenCLCVersionMax];
-	status = clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, deviceOpenCLCVersionMax, deviceOpenCLCVersion, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_OPENCL_C_VERSION: %s\n", deviceOpenCLCVersion);
-	}
-
-	cl_uint preferedByteVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, sizeof(cl_uint), &preferedByteVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR: %u\n", preferedByteVectorWidth);
-	}
-
-	cl_uint preferedShoftVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, sizeof(cl_uint), &preferedShoftVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT: %u\n", preferedShoftVectorWidth);
-	}
-
-	cl_uint preferedIntVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, sizeof(cl_uint), &preferedIntVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT: %u\n", preferedIntVectorWidth);
-	}
-
-	cl_uint preferedLongVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, sizeof(cl_uint), &preferedLongVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG: %u\n", preferedLongVectorWidth);
-	}
-
-	cl_uint preferedHalfVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, sizeof(cl_uint), &preferedHalfVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF: %u\n", preferedHalfVectorWidth);
-	}
-
-	cl_uint preferedFloatVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, sizeof(cl_uint), &preferedFloatVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT: %u\n", preferedFloatVectorWidth);
-	}
-
-	cl_uint preferedDoubleVectorWidth;
-	status = clGetDeviceInfo(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, sizeof(cl_uint), &preferedDoubleVectorWidth, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE: %u\n", preferedDoubleVectorWidth);
-	}
-
-	//~ cl_device_fp_config half_config;
-	//~ status = clGetDeviceInfo(device, CL_DEVICE_HALF_FP_CONFIG, sizeof(cl_device_fp_config), &half_config, 0);
-	//~ if (status != CL_SUCCESS) {
-		//~ fprintf(stderr, "clGetDeviceInfo (CL_DEVICE_HALF_FP_CONFIG) failed with error %d\n", status);
-	//~ } else {
-		//~ printf("CL_DEVICE_HALF_FP_CONFIG:\n");
-		//~ printf("\tCL_FP_DENORM: %s\n", (half_config & CL_FP_DENORM) ? "Yes" : "No");
-		//~ printf("\tCL_FP_INF_NAN: %s\n", (half_config & CL_FP_INF_NAN) ? "Yes" : "No");
-		//~ printf("\tCL_FP_ROUND_TO_NEAREST: %s\n", (half_config & CL_FP_ROUND_TO_NEAREST) ? "Yes" : "No");
-		//~ printf("\tCL_FP_ROUND_TO_ZERO: %s\n", (half_config & CL_FP_ROUND_TO_ZERO) ? "Yes" : "No");
-		//~ printf("\tCL_FP_ROUND_TO_INF: %s\n", (half_config & CL_FP_ROUND_TO_INF) ? "Yes" : "No");
-		//~ printf("\tCL_FP_FMA: %s\n", (half_config & CL_FP_FMA) ? "Yes" : "No");
-		//~ printf("\tCL_FP_SOFT_FLOAT: %s\n", (half_config & CL_FP_SOFT_FLOAT) ? "Yes" : "No");
-	//~ }
-
-	cl_device_fp_config float_config;
-	status = clGetDeviceInfo(device, CL_DEVICE_SINGLE_FP_CONFIG, sizeof(cl_device_fp_config), &float_config, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo (CL_DEVICE_SINGLE_FP_CONFIG) failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_SINGLE_FP_CONFIG:\n");
-		printf("\tCL_FP_DENORM: %s\n", (float_config & CL_FP_DENORM) ? "Yes" : "No");
-		printf("\tCL_FP_INF_NAN: %s\n", (float_config & CL_FP_INF_NAN) ? "Yes" : "No");
-		printf("\tCL_FP_ROUND_TO_NEAREST: %s\n", (float_config & CL_FP_ROUND_TO_NEAREST) ? "Yes" : "No");
-		printf("\tCL_FP_ROUND_TO_ZERO: %s\n", (float_config & CL_FP_ROUND_TO_ZERO) ? "Yes" : "No");
-		printf("\tCL_FP_ROUND_TO_INF: %s\n", (float_config & CL_FP_ROUND_TO_INF) ? "Yes" : "No");
-		printf("\tCL_FP_FMA: %s\n", (float_config & CL_FP_FMA) ? "Yes" : "No");
-		printf("\tCL_FP_SOFT_FLOAT: %s\n", (float_config & CL_FP_SOFT_FLOAT) ? "Yes" : "No");
-	}
-
-	cl_uint device_address_bits;
-	status = clGetDeviceInfo(device, CL_DEVICE_ADDRESS_BITS, sizeof(cl_uint), &device_address_bits, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_ADDRESS_BITS: %u\n", device_address_bits);
-	}
-
-	cl_ulong device_local_mem_size;
-	status = clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong), &device_local_mem_size, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_LOCAL_MEM_SIZE: %llu\n", (unsigned long long)(device_local_mem_size));
-	}
-
-	cl_device_local_mem_type device_local_mem_type;
-	status = clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_TYPE, sizeof(cl_device_local_mem_type), &device_local_mem_type, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		switch (device_local_mem_type) {
-			case CL_LOCAL:
-				printf("CL_DEVICE_LOCAL_MEM_TYPE: CL_LOCAL\n"); break;
-			case CL_GLOBAL:
-				printf("CL_DEVICE_LOCAL_MEM_TYPE: CL_GLOBAL\n"); break;
-			default:
-				printf("CL_DEVICE_LOCAL_MEM_TYPE: %u\n", device_local_mem_type); break;
-		}
-	}
-
-	cl_ulong global_mem_cache_size;
-	status = clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, sizeof(cl_ulong), &global_mem_cache_size, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_GLOBAL_MEM_CACHE_SIZE: %llu\n", (unsigned long long)global_mem_cache_size);
-	}
-
-	cl_device_mem_cache_type device_global_mem_cache_type;
-	status = clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, sizeof(cl_device_mem_cache_type), &device_global_mem_cache_type, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		switch (device_global_mem_cache_type) {
-			case CL_NONE:
-				printf("CL_DEVICE_GLOBAL_MEM_CACHE_TYPE: CL_NONE\n"); break;
-			case CL_READ_ONLY_CACHE:
-				printf("CL_DEVICE_GLOBAL_MEM_CACHE_TYPE: CL_READ_ONLY_CACHE\n"); break;
-			case CL_READ_WRITE_CACHE:
-				printf("CL_DEVICE_GLOBAL_MEM_CACHE_TYPE: CL_READ_WRITE_CACHE\n"); break;
-			default:
-				printf("CL_DEVICE_GLOBAL_MEM_CACHE_TYPE: %u\n", device_global_mem_cache_type); break;
-		}
-	}
-
-	cl_uint device_global_mem_cacheline_size;
-	status = clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(cl_uint), &device_global_mem_cacheline_size, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE: %u\n", device_global_mem_cacheline_size);
-	}
-
-	cl_ulong device_global_mem_size;
-	status = clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &device_global_mem_size, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_GLOBAL_MEM_SIZE: %llu\n", (unsigned long long)device_global_mem_size);
-	}
-
-	cl_bool device_host_unified_memory;
-	status = clGetDeviceInfo(device, CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(cl_bool), &device_host_unified_memory, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_HOST_UNIFIED_MEMORY: %s\n", (device_host_unified_memory == CL_TRUE) ? "CL_TRUE" : "CL_FALSE");
-	}
-
-	cl_uint device_max_clock_frequency;
-	status = clGetDeviceInfo(device, CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(cl_uint), &device_max_clock_frequency, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_MAX_CLOCK_FREQUENCY: %u\n", device_max_clock_frequency);
-	}
-
-	cl_uint device_max_compute_units;
-	status = clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &device_max_compute_units, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetDeviceInfo failed with error %d\n", status);
-		exit(status);
-	} else {
-		printf("CL_DEVICE_MAX_COMPUTE_UNITS: %u\n", device_max_compute_units);
-	}
-
-	::ctx = clCreateContext(0, 1, &::device, NULL, NULL, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateContext failed with error %d\n", status);
-		exit(status);
-	}
-
-	::commandQueue = clCreateCommandQueue(::ctx, ::device, CL_QUEUE_PROFILING_ENABLE, &status);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clCreateCommandQueue failed with error %d\n", status);
-		exit(status);
-	}
-}
-
-
 /* Execute the kernel */
 void runCL(int multiplyAdds) {
 	cl_int status;
@@ -538,7 +212,9 @@ void runCL(int multiplyAdds) {
 
 	/* Copy the data over to the device -- the command is only queued, not
 		 executed */
-	status = clEnqueueWriteBuffer(::commandQueue, inputBuffer, CL_FALSE, 0, sizeof(cl_float) * array_size, hostData, 0, NULL, &writeEvent);
+	status = clEnqueueWriteBuffer(::commandQueue, inputBuffer, CL_FALSE, 0, 
+																sizeof(cl_float) * array_size, hostData, 0, 
+																NULL, &writeEvent);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clEnqueueWriteBuffer failed with error %d\n", status);
 		exit(status);
@@ -562,9 +238,12 @@ void runCL(int multiplyAdds) {
 #else
 	size_t globalWorkSize[3] = {array_size, 0, 0};
 #endif
-	status = clEnqueueNDRangeKernel(::commandQueue, ::kernel, 1, 0, globalWorkSize, NULL, 1, &writeEvent, &computeEvent);
+	status = clEnqueueNDRangeKernel(::commandQueue, ::kernel, 1, 0, 
+																	globalWorkSize, NULL, 1, &writeEvent, 
+																	&computeEvent);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clEnqueueNDRangeKernel failed with error %d %d\n", status, CL_OUT_OF_RESOURCES);
+		fprintf(stderr, "clEnqueueNDRangeKernel failed with error %d %d\n", 
+						status, CL_OUT_OF_RESOURCES);
 		exit(status);
 	}
 
@@ -585,56 +264,74 @@ void runCL(int multiplyAdds) {
 	t_end = stopwatch_elapsed (timer);
 	fprintf (stderr, "Execution time: %Lg secs\n", t_end);
 
+	/* Measure various other times related to openCl execution */
 	cl_ulong timeStart, timeEnd, timeQueued, timeSubmitted;
-	status = clGetEventProfilingInfo(computeEvent, CL_PROFILING_COMMAND_QUEUED, sizeof(cl_ulong), &timeQueued, NULL);
+	status = clGetEventProfilingInfo(computeEvent, 
+																	 CL_PROFILING_COMMAND_QUEUED, 
+																	 sizeof (cl_ulong), &timeQueued, NULL);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", status);
+		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", 
+						status);
 	}
-	status = clGetEventProfilingInfo(computeEvent, CL_PROFILING_COMMAND_SUBMIT, sizeof(cl_ulong), &timeSubmitted, NULL);
+	status = clGetEventProfilingInfo(computeEvent, 
+																	 CL_PROFILING_COMMAND_SUBMIT, 
+																	 sizeof (cl_ulong), &timeSubmitted, NULL);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", status);
+		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", 
+						status);
 	}
-	status = clGetEventProfilingInfo(computeEvent, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &timeStart, NULL);
+	status = clGetEventProfilingInfo(computeEvent, CL_PROFILING_COMMAND_START,
+																	 sizeof (cl_ulong), &timeStart, NULL);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", status);
+		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", 
+						status);
 	}
-	status = clGetEventProfilingInfo(computeEvent, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &timeEnd, NULL);
+	status = clGetEventProfilingInfo(computeEvent, CL_PROFILING_COMMAND_END, 
+																	 sizeof (cl_ulong), &timeEnd, NULL);
 	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", status);
+		fprintf(stderr, "clGetEventProfilingInfo failed with error %d\n", 
+						status);
 	}
 
-	printf("Computed(queued-finish) in %5.3lf msecs\n", double(timeEnd - timeQueued) / 1.0e+6);
-	printf("Computed(submit-finish) in %5.3lf msecs\n", double(timeEnd - timeSubmitted) / 1.0e+6);
-	printf("Computed(start-finish) in %5.3lf msecs\n", double(timeEnd - timeStart) / 1.0e+6);
-	printf("\tPerformance: %5.3lf GFLOPS\n", double(2.0 * (double(array_size) * 1.25 * double(multiplyAdds) / 1.0e+9) / (double(timeEnd - timeStart) / 1.0e+9)));
-	printf("\tPerformance: %5.3lf GB/s\n", (2.0 * array_size * sizeof (cl_float)) / double((timeEnd - timeStart)));
+	/* Print timing info based on OpenCL counters */
+	printf("Computed (queued -> finish) in %5.3lf msecs\n", 
+				 double(timeEnd - timeQueued) / 1.0e+6);
+	printf("Computed (submit -> finish) in %5.3lf msecs\n", 
+				 double(timeEnd - timeSubmitted) / 1.0e+6);
+	printf("Computed (start -> finish) in %5.3lf msecs\n", 
+				 double(timeEnd - timeStart) / 1.0e+6);
+	printf("\tPerformance: %5.3lf GFLOPS\n", double(2.0 * (double(array_size) 
+				 * 1.25 * double(multiplyAdds) / 1.0e+9) / (double(timeEnd - 
+				 timeStart) / 1.0e+9)));
+	printf("\tPerformance: %5.3lf GB/s\n", (2.0 * array_size * sizeof 
+				 (cl_float)) / double((timeEnd - timeStart)));
 
+	/* Print timing info based on custom timer */
 	printf("Computed in %5.3Lg secs\n", t_end);
-	printf("\tPerformance: %5.3lf GFLOPS\n", double(2.0 * (double(array_size) * 1.25 * double(multiplyAdds) / 1.0e+9) / t_end));
-	printf("\tPerformance: %5.3Lg GB/s\n", ((2.0 * array_size * sizeof (cl_float))/1.0e+9) / t_end);
+	printf("\tPerformance: %5.3lf GFLOPS\n", double(2.0 * (double(array_size) 
+				 * 1.25 * double(multiplyAdds) / 1.0e+9) / t_end));
+	printf("\tPerformance: %5.3Lg GB/s\n", ((2.0 * array_size * sizeof 
+				 (cl_float))/1.0e+9) / t_end);
 
+	/* Clean up */
 	clReleaseEvent(writeEvent);
 	clReleaseEvent(computeEvent);
 }
+/* ============================================================ */
 
+/* ============================================================ */
 void verify(int multiplyAdds) {
 	cl_int status = CL_FALSE;
-	cl_float* hostOutput = (cl_float*)malloc(sizeof(cl_float) * array_size);
-	cl_float* hostOutput_ = (cl_float*)malloc(sizeof(cl_float) * array_size/4);
+	cl_float* hostOutput = (cl_float*) malloc (sizeof (cl_float) * 
+												 array_size);
 
-	status = clEnqueueReadBuffer(::commandQueue, ::outputBuffer, CL_TRUE, 0, sizeof(cl_float) * array_size, hostOutput, 0, NULL, 0);
+	status = clEnqueueReadBuffer(::commandQueue, ::outputBuffer, CL_TRUE, 0, 
+															 sizeof(cl_float) * array_size, hostOutput, 0,
+															 NULL, 0);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "clEnqueueReadBuffer failed with error %d\n", status);
 		exit(status);
 	}
-
-	/*
-	status = clEnqueueReadBuffer(::commandQueue, ::outputBuffer_, CL_TRUE, 0, sizeof(cl_float) * array_size/4, hostOutput_, 0, NULL, 0);
-	if (status != CL_SUCCESS) {
-		fprintf(stderr, "clEnqueueReadBuffer failed with error %d\n", status);
-		exit(status);
-	}
-	 */
 
 	size_t countDiff = 0;
 	for (size_t i = 0; i < array_size; i++) {
@@ -648,20 +345,33 @@ void verify(int multiplyAdds) {
 			}
 		}
 	}
-	/*
-	for (size_t i = 0; i < array_size/4; i++) {
-		if (fabsf(hostData_[i] * hostData_[i] * float(multiplyAdds) - hostOutput_[i]) > 1.0e-4 * hostOutput_[i]) {
-			countDiff++;
-		}
-	}
-	 */
 
 	if (countDiff != 0) {
-		fprintf(stderr, "Output verification failed: num of mismatch: %zu\n", countDiff);
+		fprintf(stderr, "Output verification failed: num of mismatch: %zu\n", 
+						countDiff);
+	} else {
+		fprintf(stderr, "Output verification success: num of mismatch: %zu\n", 
+						countDiff);
 	}
 
 	free(hostOutput);
 }
+/* ============================================================ */
+
+
+/* ============================================================ */
+/* Free up allocated memory */
+void cleanupCL() {
+	free(hostData);
+
+	clReleaseMemObject(::inputBuffer);
+	clReleaseMemObject(::outputBuffer);
+	clReleaseKernel(::kernel);
+	clReleaseProgram(::program);
+	clReleaseCommandQueue(::commandQueue);
+	clReleaseContext(::ctx);
+}
+/* ============================================================ */
 
 
 int main(int argc, char** argv) {
