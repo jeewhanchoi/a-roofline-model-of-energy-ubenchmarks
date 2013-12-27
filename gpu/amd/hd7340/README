@@ -1,0 +1,14 @@
+How to compile:
+
+%========================================
+This benchmark loads 4 words of data per thread and does 5 MADs.
+We do 5 MADs instead of 4 because the HD 7340 uses VLIW5 ISA.
+%========================================
+Intensity benchmark
+	Single:
+		make 
+%========================================
+
+How to execute:
+./clbench <array size N (in M)> <M MADs>
+The arithmetic intensity of this benchmark is (5 * N flops) / (4 * X bytes), where X is the number of bytes per word. In this case, 4 since HD 7340 only has single-precision units.
