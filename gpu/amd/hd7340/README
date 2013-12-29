@@ -11,4 +11,4 @@ Intensity benchmark
 
 How to execute:
 ./clbench <array size N (in M)> <M MADs>
-The arithmetic intensity of this benchmark is (5 * N flops) / (4 * X bytes), where X is the number of bytes per word. In this case, 4 since HD 7340 only has single-precision units.
+The arithmetic intensity of this benchmark is (5 * 2 * M flops) / (2 * 4 * X bytes), where X is the number of bytes per word. In this case, 4 since HD 7340 only has single-precision units.
