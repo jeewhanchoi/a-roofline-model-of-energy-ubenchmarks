@@ -1,0 +1,27 @@
+How to compile:
+
+%========================================
+Intensity benchmark
+	Single:
+		make MAD_PER_ELEMENT=<M> TYPE=0
+	Double:
+		make MAD_PER_ELEMENT=<M> TYPE=1
+%========================================
+
+How to execute:
+./main
+
+
+1) For single precision function, the kernel issues  1 MUL followed by 1 
+ADD, M times.
+However, for double precision function, the kernel issues 1 ADD, 1 MUL, 
+then 1 ADD, M times. This is done since the core can't issue 
+double-precision MUL back to back.
+
+2) Multicore execution is done using OpenMP.
+
+3) For a given M, the arithmetic intensity of this benchmark is different for single and double.
+Single
+	intensity = (M * 2 flops) / (4 bytes)
+Double
+	intensity = (M * 3 flops) / (8 bytes)
