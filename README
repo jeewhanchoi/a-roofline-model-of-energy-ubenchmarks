@@ -10,15 +10,15 @@ The list of benchmarks are
 4) random access
 
 The list of target systems are
-1) CPU (Nehalem)
-2) CPU (Ivy Bridge)
-3) GPU (HD4000)
-4) GPU (Fermi)
-5) GPU (Kepler)
-6) ARM (Cortex A9)
-7) ARM (Cortex A15)
-8) GPU (Mali T604)
-9) CPU (AMD)
-10) GPU (Radeon)
+1) CPU (Nehalem) (N/A)
+2) CPU (Ivy Bridge) (N/A)
+3) GPU (HD4000) (N/A)
+4) GPU (Fermi) (intensity,compute,bandwidth)
+5) GPU (Kepler) (intensity,compute,bandwidth)
+6) ARM (Cortex A9) (N/A)
+7) ARM (Cortex A15) (N/A)
+8) GPU (Mali T604) (N/A)
+9) CPU (AMD) (intensity)
+10) GPU (Radeon) (intensity DONE)
 
 To compile the ubenchmarks do the following:

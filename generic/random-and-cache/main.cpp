@@ -717,10 +717,12 @@ void Benchmark_ReadRandom(const char* function_name, const void* memory, size_t 
 	}
 	const uint64_t end = timer::get_nsecs();
 
-	double mega_accesses = (double(bytes / stride) / 1.0e+6) * double(random_iterations);
+	double mega_accesses = (double (bytes / stride) / 1.0e+6) * 
+													double (random_iterations);
 	double secs = double(end - start) / 1.0e+9;
 	double maps = mega_accesses / secs;
-	printf("%s" "\t" "%u" "\t" "%4.03lf\n", function_name, unsigned(stride), maps);
+	printf("%s" "\t" "%u" "\t" "%4.03lf\n", function_name, unsigned(stride),
+				 maps);
 }
 
 void Benchmark_UpdateRandomAtomic(const char* function_name, const void* memory, size_t bytes, size_t stride, size_t random_iterations) {
@@ -890,47 +892,85 @@ void Benchmark_UpdateRandomAtomic(const char* function_name, const void* memory,
 	printf("%s" "\t" "%u" "\t" "%4.03lf\n", function_name, unsigned(stride), maps);
 }
 
+
 int main(int argc, char** argv) {
-	const size_t array_length = 1024*1024*32;
+	/* Size of the array */
+	/* This should be adjusted depending on the type of test
+	 * e.g., DRAM test ==> Large; 
+		 Cache test ==> ~2 * lower level cache <= size <= ~1/4 cache size
+	 */
+	const size_t array_length = 1024 * 1024 * 32;
+
+	/* Number of iterations */
 	const size_t random_iterations = 32;
-	const size_t read_iterations = 1024*512;
-	
-	uint32_t* data = (uint32_t*)memalign(64, array_length*sizeof(uint32_t));
-	memset(data, 0, array_length*sizeof(uint32_t));
+	/* Number of iterations */
+	const size_t read_iterations = 1024 * 512;
+
+	/* Allocate and initialize memory */
+	uint32_t* data = (uint32_t*) memalign (64, array_length * 
+																				 sizeof (uint32_t));
+	memset(data, 0, array_length * sizeof (uint32_t));
 
 	#ifndef __ANDROID__
 		printf("OpenMP threads: %d\n", omp_get_max_threads());
 	#endif
 
+	/* Choose between these for DRAM random access benchmark
+		 1) pointer chasing random access (UBENCH_TEST_RANDOM_POINTER_CHASING)
+		 2) on-the-fly random access (UBENCH_TEST_RANDOM_READ)
+	 */
 	#define UBENCH_TEST_RANDOM_POINTER_CHASING
 	//~ #define UBENCH_TEST_RANDOM_READ
 
+/* =================================================================== */
 #if defined(UBENCH_TEST_RANDOM_POINTER_CHASING)
+/* This is the pointer chasing version that "randomly" traverses all
+	 the elements in an array using a shift-based algorithm */
 	{
 		printf("Version" "\t" "MA/s" "\n");
+
+		/* The shifting algorithm used for generating the "pointer chasing" 
+			 array 
+			 25 is the number of bits representing the size of the array 
+		   for array_length = 1024 * 1024 * 32 = 32M ==> 25 bits 
+		 */
 		XorShift rng = XorShift(1u, 25);
 		uint32_t prevIndex = 1;
 		data[0] = 1;
+		/* initialize the array using the algorithm */
 		for (size_t i = 0; i < array_length; i++) {
 			const uint32_t index = rng.next();
 			data[prevIndex] = index;
 			prevIndex = index;
 		}
+
+		/* We'll be using 12 simultaneous pointer chasers */
+		/* Each chaser will  start from equidistantly placed  positions in 
+			 the array 
+		 */
 		uint32_t initialVector[12];
 		for (size_t i = 0; i < 12; i++) {
 			initialVector[i] = (array_length / 12) * i + 1;
 		}
+
 		const uint64_t start = timer::get_nsecs();
+		/* For ARM processors */
 		#ifdef __arm__
-			uBench_ReadMemory_12PointerChasing_LDR(array_length, data, initialVector);
+			uBench_ReadMemory_12PointerChasing_LDR(array_length, data, 
+																						 initialVector);
+		/* x86 processors */
 		#else
-			uBench_ReadMemory_12PointerChasing_MOV(array_length, data, initialVector);
+			uBench_ReadMemory_12PointerChasing_MOV(array_length, data, 
+																						 initialVector);
 		#endif
 		const uint64_t end = timer::get_nsecs();
 
+		/* Total number of accesses */
 		double mega_accesses = double(array_length) * 12.0 / 1.0e+6;
 		double secs = double(end - start) / 1.0e+9;
+		/* Millions of accesses per second */
 		double maps = mega_accesses / secs;
+
 		#ifdef __arm__
 			printf("%s" "\t" "%4.03lf\n", "LDR", maps);
 		#else
@@ -938,6 +978,30 @@ int main(int argc, char** argv) {
 		#endif
 	}
 #endif
+/* =================================================================== */
+
+/* =================================================================== */
+#if defined(UBENCH_TEST_RANDOM_READ)
+/* This is the on-the-fly version that "randomly" traverses all
+	 the elements in an array. That is, the next index is calculated on the
+	 fly instead of pre-calculating it in a pointer-chasing array  */
+	printf("Version" "\t" "Stride" "\t" "MA/s" "\n");
+	#ifdef __arm__
+		Benchmark_ReadRandom("LDR", data, array_length, 32, 
+												 random_iterations / 64);
+		Benchmark_ReadRandom("LDR", data, array_length, 64, 
+												 random_iterations / 64);
+		Benchmark_ReadRandom("LDR", data, array_length, 128, 
+												 random_iterations / 64);
+	#else
+		Benchmark_ReadRandom("MOV", data, array_length, 32, random_iterations / 64);
+		Benchmark_ReadRandom("MOV", data, array_length, 64, random_iterations / 64);
+		Benchmark_ReadRandom("MOV", data, array_length, 128, random_iterations / 64);
+	#endif
+#endif
+/* =================================================================== */
+
+
 	
 #if defined(UBENCH_TEST_RANDOM_CACHE_READ)
 	printf("Version" "\t" "MA/s" "\n");
@@ -965,18 +1029,6 @@ int main(int argc, char** argv) {
 	#endif
 #endif
 
-#if defined(UBENCH_TEST_RANDOM_READ)
-	printf("Version" "\t" "Stride" "\t" "MA/s" "\n");
-	#ifdef __arm__
-		Benchmark_ReadRandom("LDR", data, array_length, 32, random_iterations / 64);
-		Benchmark_ReadRandom("LDR", data, array_length, 64, random_iterations / 64);
-		Benchmark_ReadRandom("LDR", data, array_length, 128, random_iterations / 64);
-	#else
-		Benchmark_ReadRandom("MOV", data, array_length, 32, random_iterations / 64);
-		Benchmark_ReadRandom("MOV", data, array_length, 64, random_iterations / 64);
-		Benchmark_ReadRandom("MOV", data, array_length, 128, random_iterations / 64);
-	#endif
-#endif
 
 #if defined(UBENCH_TEST_SEQUENTIAL_READ)
 	printf("Version" "\t" "Prefetch" "\t" "GB/s" "\n");
