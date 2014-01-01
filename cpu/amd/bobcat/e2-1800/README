@@ -7,10 +7,6 @@ Intensity benchmark
 	Double:
 		make MAD_PER_ELEMENT=<M> TYPE=1
 %========================================
-Cache benchmark
-
-%========================================
-
 
 How to execute:
 ./main

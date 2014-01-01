@@ -14,4 +14,4 @@ arm:
 	g++ -O2 -g -march=armv7-a -o ubench-arm -static main.cpp arm-sequential.o arm-random.o arm-random-atomic.o -lrt -fopenmp
 clean:
 	rm -f *.o
-	rm -f ubench-ivb	
+	rm -f ubench-x64 ubench-arm ubench-k1om

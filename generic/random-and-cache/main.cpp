@@ -533,25 +533,26 @@ extern "C" void uBench_UpdateMemory_RandomAtomic30_LLSC_Stride64(const void* mem
 extern "C" void uBench_UpdateMemory_RandomAtomic30_LLSC_Stride128(const void* memory);
 
 void Benchmark_ReadSequential(void (*memory_read_function)(const void*, size_t), const char* function_name, const void* memory, size_t bytes, size_t read_iterations) {
-	const uint64_t start = timer::get_nsecs();
+	const uint64_t start = timer::get_nsecs ();
 	for (size_t iteration = 0; iteration < read_iterations; iteration++) {
-		memory_read_function(memory, bytes);
+		memory_read_function (memory, bytes);
 	}
-	const uint64_t end = timer::get_nsecs();
-	double gb = double(bytes) * double(read_iterations) / 0x1.0p+30;
-	double secs = double(end - start) / 1.0e+9;
+	const uint64_t end = timer::get_nsecs ();
+	double gb = double (bytes) * double (read_iterations) / 0x1.0p+30;
+	double secs = double (end - start) / 1.0e+9;
 	double gbps = gb / secs;
-	printf("%s" "\t" "%4.03lf\n", function_name, gbps);
+	printf ("%s" "\t" "%4.03lf\n", function_name, gbps);
 }
 
 void Benchmark_ReadCacheRandom(void (*memory_read_function)(const void*, size_t), const char* function_name, const void* memory, size_t bytes, size_t read_iterations, size_t bytes_per_access) {
-	const uint64_t start = timer::get_nsecs();
+	const uint64_t start = timer::get_nsecs ();
 	for (size_t iteration = 0; iteration < read_iterations; iteration++) {
-		memory_read_function(memory, bytes);
+		memory_read_function (memory, bytes);
 	}
 	const uint64_t end = timer::get_nsecs();
-	double gb = double(bytes) * double(read_iterations) / double(bytes_per_access) / 0x1.0p+30;
-	double secs = double(end - start) / 1.0e+9;
+	double gb = double(bytes) * double(read_iterations) / 
+							double (bytes_per_access) / 0x1.0p+30;
+	double secs = double (end - start) / 1.0e+9;
 	double gbps = gb / secs;
 	printf("%s" "\t" "%4.03lf\n", function_name, gbps);
 }
@@ -713,13 +714,13 @@ void Benchmark_ReadRandom(const char* function_name, const void* memory, size_t 
 	memory_read_function(memory);
 	const uint64_t start = timer::get_nsecs();
 	for (size_t i = 0; i < random_iterations; i++) {
-		memory_read_function(memory);
+		memory_read_function (memory);
 	}
 	const uint64_t end = timer::get_nsecs();
 
 	double mega_accesses = (double (bytes / stride) / 1.0e+6) * 
 													double (random_iterations);
-	double secs = double(end - start) / 1.0e+9;
+	double secs = double (end - start) / 1.0e+9;
 	double maps = mega_accesses / secs;
 	printf("%s" "\t" "%u" "\t" "%4.03lf\n", function_name, unsigned(stride),
 				 maps);
@@ -922,6 +923,31 @@ int main(int argc, char** argv) {
 	#define UBENCH_TEST_RANDOM_POINTER_CHASING
 	//~ #define UBENCH_TEST_RANDOM_READ
 
+
+	/* Cache random read ubench 
+	 */
+	//~ #define UBENCH_TEST_RANDOM_CACHE_READ
+
+	/* 
+		Memory and cache read benchmark
+		If the array size is >> cache size, it becomes a DRAM benchmark
+		If the array size is < cache size, it beomces a cache benchmark
+		1) UBENCH_TEST_SEQUENTIAL_READ reads sequentially and includes /w
+			 prefetching and /wo prefetching.
+		2) UBENCH_TEST_SEMISEQUENTIAL_READ reads from both ends of the array
+			 in an attempt to minimize the effect of prefetching.
+			 By reading from both ends to the center sequentially, any prefetched
+			 data from one stream will be consumed by the other resulting in no
+			 redundant data being read from the memory.
+	 */
+	//~ #define UBENCH_TEST_SEQUENTIAL_READ
+	//~ #define UBENCH_TEST_SEMISEQUENTIAL_READ
+
+	/*
+		Atomic update benchmark
+	 */
+	//~ #define UBENCH_TEST_RANDOM_ATOMIC_UPDATE
+
 /* =================================================================== */
 #if defined(UBENCH_TEST_RANDOM_POINTER_CHASING)
 /* This is the pointer chasing version that "randomly" traverses all
@@ -994,43 +1020,58 @@ int main(int argc, char** argv) {
 		Benchmark_ReadRandom("LDR", data, array_length, 128, 
 												 random_iterations / 64);
 	#else
-		Benchmark_ReadRandom("MOV", data, array_length, 32, random_iterations / 64);
-		Benchmark_ReadRandom("MOV", data, array_length, 64, random_iterations / 64);
-		Benchmark_ReadRandom("MOV", data, array_length, 128, random_iterations / 64);
+		Benchmark_ReadRandom("MOV", data, array_length, 32, 
+												 random_iterations / 64);
+		Benchmark_ReadRandom("MOV", data, array_length, 64, 
+												 random_iterations / 64);
+		Benchmark_ReadRandom("MOV", data, array_length, 128, 
+												 random_iterations / 64);
 	#endif
 #endif
 /* =================================================================== */
 
 
-	
+/* =================================================================== */
 #if defined(UBENCH_TEST_RANDOM_CACHE_READ)
+	/*
+		This is a cache random access ubenchmark.
+		It accesses randomly within a 2KB region then moves onto the next 2K 
+		region and so on.
+		Within the region there are 512 memory instructions and 32 accessed
+		cache lines.
+		Our access pattern is (hopefully) beyond what prefetchers can handle 
+		so that it does not recognize the repetitive pattern of access and 
+		assumes random access and thus disables prefetching.
+	 */
 	printf("Version" "\t" "MA/s" "\n");
 	#ifdef __arm__
-		Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_LDR, "LDR", data, array_length, read_iterations, 4);
-		Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_VLDR, "VLDR", data, array_length, read_iterations, 4);
+		Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_LDR, "LDR", data,
+															 array_length, read_iterations, 4);
+		Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_VLDR, "VLDR", 
+															data, array_length, read_iterations, 4);
 	#else
-		Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_MOV, "MOV", data, array_length, read_iterations, 4);
+		Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_MOV, "MOV", data,
+															array_length, read_iterations, 4);
 		#ifndef __MIC__
-			Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_MOVSS, "MOVSS", data, array_length, read_iterations, 4);
+			Benchmark_ReadCacheRandom(&uBench_ReadMemory_2KRandom_MOVSS, "MOVSS",
+																data, array_length, read_iterations, 4);
 		#endif
 	#endif
 #endif
-
-#if defined(UBENCH_TEST_RANDOM_ATOMIC_UPDATE)
-	printf("Version" "\t" "Stride" "\t" "MA/s" "\n");
-	#ifdef __arm__
-		Benchmark_UpdateRandomAtomic("LL-SC", data, array_length, 32, random_iterations);
-		Benchmark_UpdateRandomAtomic("LL-SC", data, array_length, 64, random_iterations);
-		Benchmark_UpdateRandomAtomic("LL-SC", data, array_length, 128, random_iterations);
-	#elif !defined(__MIC__)
-		Benchmark_UpdateRandomAtomic("INC", data, array_length, 32, random_iterations);
-		Benchmark_UpdateRandomAtomic("INC", data, array_length, 64, random_iterations);
-		Benchmark_UpdateRandomAtomic("INC", data, array_length, 128, random_iterations);
-	#endif
-#endif
+/* =================================================================== */
 
 
+/* =================================================================== */
 #if defined(UBENCH_TEST_SEQUENTIAL_READ)
+	/* Memory read ubenchmark.
+		 These benchmarks can be for both DRAM and cache depending on the
+		 array size.
+		 These benchmarks read data sequentially from the beginning of the
+		 array to the end. Because of prefetching effects, it is recommended
+		 that you use the "SEMISEQUENTIAL" version for DRAM and "SEQUENTIAL" 
+		 version for caches.
+		 There are versions that use prefetching and a version that does not.
+	 */
 	printf("Version" "\t" "Prefetch" "\t" "GB/s" "\n");
 
 	#ifdef __arm__
@@ -1089,10 +1130,24 @@ int main(int argc, char** argv) {
 	#endif
 	
 #endif
+/* =================================================================== */
 
+
+/* =================================================================== */
 #if defined(UBENCH_TEST_SEMISEQUENTIAL_READ)
 	printf("Version" "\t" "GB/s" "\n");
-
+	/* Memory read ubenchmark.
+		 These benchmarks can be for both DRAM and cache depending on the
+		 array size.
+		 These benchmarks read data semi-sequentially from the beginning of the
+		 array to the end. That is, it reads from both ends of the array.
+		 This is done to minimize the effects of prefetching.
+		 By reading from both ends, any data prefetched for one stream will
+		 be consumed by the other (hopefully).
+		 Because of prefetching effects, it is recommended
+		 that you use the "SEMISEQUENTIAL" version for DRAM and "SEQUENTIAL" 
+		 version for caches.
+	 */
 	#ifdef __arm__
 		Benchmark_ReadSequential(&uBench_ReadMemory_SemiSequential_LDR_NoPrefetch, "LDR", data, array_length, read_iterations);
 
@@ -1124,3 +1179,22 @@ int main(int argc, char** argv) {
 #endif
 	free(data);	
 }
+/* =================================================================== */
+
+
+/* =================================================================== */
+#if defined(UBENCH_TEST_RANDOM_ATOMIC_UPDATE)
+	printf("Version" "\t" "Stride" "\t" "MA/s" "\n");
+	#ifdef __arm__
+		Benchmark_UpdateRandomAtomic("LL-SC", data, array_length, 32, random_iterations);
+		Benchmark_UpdateRandomAtomic("LL-SC", data, array_length, 64, random_iterations);
+		Benchmark_UpdateRandomAtomic("LL-SC", data, array_length, 128, random_iterations);
+	#elif !defined(__MIC__)
+		Benchmark_UpdateRandomAtomic("INC", data, array_length, 32, random_iterations);
+		Benchmark_UpdateRandomAtomic("INC", data, array_length, 64, random_iterations);
+		Benchmark_UpdateRandomAtomic("INC", data, array_length, 128, random_iterations);
+	#endif
+#endif
+/* =================================================================== */
+
+
