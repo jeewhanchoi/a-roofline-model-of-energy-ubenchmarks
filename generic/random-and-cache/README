@@ -1,0 +1,21 @@
+How to compile:
+
+%========================================
+memory/cache benchmark
+		make 
+%========================================
+
+How to execute:
+./ubench-<CPU TYPE>
+
+e.g., ubench-x64 for Intel and AMD x86 CPUs
+
+This suite of benchmarks are for testing the memory system.
+It includes the following performance ubenchmarks for x64, ARM and Xeon Phi:
+1) Random access benchmark for DRAM 
+	a) random pointer-chasing
+	b) on-the-fly random index generation
+2) Random access benchmark for cache
+3) Sequential read ubenchmark for DRAM and cache
+4) Semi-sequential read ubenchmark (to minimize prefetching)
+5) Atomic update benchmark
