@@ -5,10 +5,21 @@ This benchmark loads 4 words of data per thread and does 5 MADs.
 We do 5 MADs instead of 4 because the HD 7340 uses VLIW5 ISA.
 %========================================
 Intensity benchmark
-	Single:
-		make 
+	make clbench
+Cache/shared memory benchmark
+	make clcache
 %========================================
 
 How to execute:
+1) Intensity
 ./clbench <array size N (in M)> <M MADs>
 The arithmetic intensity of this benchmark is (5 * 2 * M flops) / (2 * 4 * X bytes), where X is the number of bytes per word. In this case, 4 since HD 7340 only has single-precision units.
+
+2) Cache
+./clcache <# threads (in Ks)> <block size> <cache size> <vector size>
+a) "# of threads" is in thousands (2^10) and block size is the 
+b) "block size" is the localWorkSize
+c) "cache size" is the number of elements in the local memory array
+	 That is, local array size in Bytes = "cache size" * "vector size" * 
+	 sizeof (float)
+d) "vector size" is the data type length. If 4, array is that of float4.
