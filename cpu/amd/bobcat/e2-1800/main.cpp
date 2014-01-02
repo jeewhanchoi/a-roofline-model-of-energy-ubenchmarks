@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 					sumsq(data0, array_length);
 					const uint64_t end0 = cpu::get_ticks_release();
 
-					execTime0 = double(end0 - start0)/1.7e+9;
+					execTime0 = double(end0 - start0) / 1.7e+9;
 				}
 				#else
 				/* For single precision */
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 					sumsqf((const float*)data0, array_length * 2);
 					const uint64_t end0 = cpu::get_ticks_release();
 
-					execTime0 = double(end0 - start0)/1.7e+9;
+					execTime0 = double(end0 - start0) / 1.7e+9;
 				}
 				#endif
 			}
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 					sumsq(data1, array_length);
 					const uint64_t end1 = cpu::get_ticks_release();
 
-					execTime1 = double(end1 - start1)/1.7e+9;
+					execTime1 = double(end1 - start1) / 1.7e+9;
 				}
 				#else
 				/* For single precision */
@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
 					sumsqf((const float*)data1, array_length * 2);
 					const uint64_t end1 = cpu::get_ticks_release();
 
-					execTime1 = double(end1 - start1)/1.7e+9;
+					execTime1 = double(end1 - start1) / 1.7e+9;
 				}
 				#endif
 
