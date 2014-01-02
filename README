@@ -21,7 +21,7 @@ The list of target systems are
 7) ARM (Cortex A15) (DRAM/cache read/random)      (intensity)
 8) GPU (Mali T604)  (N/A)                         (intensity,cache read,DRAM random)
 9) CPU (AMD)        (intensity,DRAM/cache readd/random) (DONE)
-10) GPU (Radeon)    (intensity)                   (cache read, DRAM random)
+10) GPU (Radeon)    (intensity, cache read)       (DRAM random)
 11) Xeon Phi        (DRA/cache read/random)       (intensity)
 --------------------------------------------------------------------------
 * Not tested properly and may not be included in the final version
