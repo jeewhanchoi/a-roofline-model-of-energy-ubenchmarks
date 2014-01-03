@@ -19,3 +19,7 @@ It includes the following performance ubenchmarks for x64, ARM and Xeon Phi:
 3) Sequential read ubenchmark for DRAM and cache
 4) Semi-sequential read ubenchmark (to minimize prefetching)
 5) Atomic update benchmark
+
+* One thing to note is that all these ubenchmarks for a single core only.
+In order to fully utilize all the cores on the entire CPU, declare n idential data structures (where n is the number of cores) and use "OpenMP sections" to run the functions simultaneously on differnet cores.
+
