@@ -1,0 +1,20 @@
+How to compile:
+
+%========================================
+Intensity benchmark
+	Single:
+		make single MAD_PER_ELEMENT=<M> 
+	Double:
+		make double MAD_PER_ELEMENT=<M>
+%========================================
+
+How to execute:
+./single <Data size (in Bytes)> <intensity>
+
+1) For a given "POLYNOMAIL_POWER"=N, for each word of data, the kernel does 2 * N Flops (N sequences of ADD and MUL).
+2) For "Data size"=M, there are M/sizeof(data type) elements in the input array, where data type could be single or double.
+3) For the input "intensity", the value should match the value given for "POLYNOMIAL_POWER". For example, in the case of "POLYNOMIAL_POWER"=2 for single precision benchmark, "intensity" should be (2*2) flops / (4) bytes = 1. 
+This value is only used to compute performance numbers, and does not actually change how the kernel is executed.
+4) Note that the results are discarded after computation, so there is only read from memory, but no writes back to the memory.
+
+
