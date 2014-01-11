@@ -1,3 +1,21 @@
+How to compile:
 
+%========================================
+Intensity benchmark
+	Single:
+		make N=<n> PRECISION=sp
+	Double:
+		make N=<n> PRECISION=dp
+%========================================
 
-supported N is 1-20, 25, 30, 35, 40, 50, 60, ..., 300. 
+How to execute:
+./benchsp5 240
+
+1) In order to change the input array size, change SIZEPERTHREAD in bench.c
+2) In order to get accurate timing and performance information, make sure 
+   CPUFREQ in bench.c matches the system's clock.
+3) Arithmetic intensity is calculate as (2 * n / sizeof (data type)).
+4) Supported N values are 1-20, 25, 30, 35, 40, 50, 60, ..., 300. 
+5) Recommended thread number is 4 * (# compute cores), since it is 4-way 
+	 hardware multi-threaded.
+6) Make sure libiomp5.so is available on the Phi.
