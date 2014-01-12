@@ -36,3 +36,20 @@ Intensity benchmark
 	Double:
 		make intensityDbl TYPE=double
 %========================================
+
+
+%========================================
+	This benchmark tests the L2 cache
+bandwidth for Kepler GPUs.
+	Since the L1 cache is reserved for spills
+on Keplers (unlike Fermi which caches data
+in L1 as well), even if the dataset size
+is made small enough to fit in the L1 cache,
+data will still come from L2.
+	This benchmark uses a simple pointer chaser 
+to implement the memory reads to minimize 
+redundant computation.
+%========================================
+Cache benchmark
+	make cachetest
+%========================================
