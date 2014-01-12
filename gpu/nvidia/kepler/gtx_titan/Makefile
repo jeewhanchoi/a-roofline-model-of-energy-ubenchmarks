@@ -30,6 +30,7 @@ NVCCLIBS += -L$(CUDA_INSTALL_PATH)/lib64 $(CUDALIB) -L$(CUDA_SDK_INSTALL_PATH)/C
 # computeIlp : compute ubenchmark
 # bandwidthIlp: bandwidth ubenchmark
 # intensityIlp: intensity ubenchmark
+# intensityDbl: double-precision intensity benchmark
 # cachetest: L2 cache test ubenchmark
 # smtest : shared memory test ubenchmark
 # gpurand: random access test ubenchmark
@@ -37,7 +38,8 @@ TARGETS += computeIlp
 TARGETS += bandwidthIlp
 TARGETS += intensityIlp
 TARGETS += intensityDbl
-#TARGETS += cachetest
+TARGETS += intensityInt
+TARGETS += cachetest
 #TARGETS += smtest
 #TARGETS += gpurand
 
@@ -54,6 +56,12 @@ endif
 ifeq ($(TYPE),float4)
 	DTYPE = -DTYPE=float4 -DCONST=0.01f -DONE=1.0f -DTWO=2.0f -DZERO=0.0f
 endif
+
+# float4 data type
+ifeq ($(TYPE),int)
+	DTYPE = -DTYPE=int -DCONST=4 -DONE=1 -DTWO=2 -DZERO=0
+endif
+
 
 all: $(TARGETS)
 
@@ -89,11 +97,18 @@ intensityDbl: $(INTENSITYDBL_OBJECTS)
 	$(NVCC) $(NVCCLIBS) $(INTENSITYDBL_OBJECTS) -o $@
 # ===========================================================================
 
+# ===========================================================================
+INTENSITYINT_SOURCES = jeeintbench.cu py.intensity_kernel.int.cu
+INTENSITYINT_OBJECTS = $(INTENSITYINT_SOURCES:.cu=.o)
+
+intensityInt: $(INTENSITYINT_OBJECTS)
+	$(NVCC) $(NVCCLIBS) $(INTENSITYINT_OBJECTS) -o $@
+# ===========================================================================
 
 
 
 # ===========================================================================
-CACHETEST_SOURCES = jeecachetest.cu cache_kernel.cu pm_lib_cuda.cu
+CACHETEST_SOURCES = jeecachetest.cu cache_kernel.cu 
 CACHETEST_OBJECTS = $(CACHETEST_SOURCES:.cu=.o)
 
 cachetest: $(CACHETEST_OBJECTS)

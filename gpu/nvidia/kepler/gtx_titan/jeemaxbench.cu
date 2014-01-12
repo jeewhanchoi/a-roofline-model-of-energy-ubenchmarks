@@ -1306,8 +1306,8 @@ int main(int argc, char** argv)
 	// dim3 grid (num_blocks);
 	// dim3 threads (bSize);
 
-	fprintf (stderr, "Sleeping...\n");
-	sleep (1);
+	// fprintf (stderr, "Sleeping...\n");
+	// sleep (1);
 
   // start timer
 	cutilSafeCall (cudaEventCreate (&start));

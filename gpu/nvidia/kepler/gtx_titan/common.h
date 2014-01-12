@@ -7,5 +7,5 @@
 #endif
 
 #ifndef NUM_ITER
-	#define NUM_ITER 100
+	#define NUM_ITER 10
 #endif
