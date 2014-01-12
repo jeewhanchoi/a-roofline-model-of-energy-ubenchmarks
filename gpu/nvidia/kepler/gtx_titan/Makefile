@@ -40,7 +40,7 @@ TARGETS += intensityIlp
 TARGETS += intensityDbl
 TARGETS += intensityInt
 TARGETS += cachetest
-#TARGETS += smtest
+TARGETS += smtest
 #TARGETS += gpurand
 
 
