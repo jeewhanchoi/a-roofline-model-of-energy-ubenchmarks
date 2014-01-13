@@ -64,3 +64,13 @@ redundant computation.
 Shared memory benchmark
 	make smtest
 %========================================
+
+%========================================
+	This benchmark tests the random memory
+access performance.
+	This benchmark uses a random pointer chaser 
+to implement the memory reads.
+%========================================
+Shared memory benchmark
+	make gpurand 
+%========================================

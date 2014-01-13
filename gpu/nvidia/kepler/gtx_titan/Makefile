@@ -41,7 +41,7 @@ TARGETS += intensityDbl
 TARGETS += intensityInt
 TARGETS += cachetest
 TARGETS += smtest
-#TARGETS += gpurand
+TARGETS += gpurand
 
 
 # default data type is double-precision (double)
@@ -121,16 +121,12 @@ smtest: $(SMTEST_OBJECTS)
 	$(NVCC) $(NVCCLIBS) $(SMTEST_OBJECTS) -o $@
 # ===========================================================================
 
-
-
-
-
 # ===========================================================================
-GPURANDTEST_SOURCES = jeerandmem.cu pm_lib_cuda.cu
+GPURANDTEST_SOURCES = jeerandmem.cu 
 GPURANDTEST_OBJECTS = $(GPURANDTEST_SOURCES:.cu=.o)
 
 gpurand: $(GPURANDTEST_OBJECTS)
-	$(NVCC) $(NVCCLIBS) $(GPURANDTEST_OBJECTS) -o $@ 
+	$(NVCC) $(NVCCLIBS) $(GPURANDTEST_OBJECTS) -o $@ -Xcompiler -fopenmp -lgomp
 # ===========================================================================
 
 
