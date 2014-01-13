@@ -36,7 +36,7 @@ NVCCLIBS += -L$(CUDA_INSTALL_PATH)/lib64 $(CUDALIB) -L$(CUDA_SDK_INSTALL_PATH)/C
 TARGETS += compute
 TARGETS += bandwidthIlp
 TARGETS += intensity
-#TARGETS += cachetest
+TARGETS += cachetest
 #TARGETS += smtest
 #TARGETS += gpurand
 
@@ -80,16 +80,16 @@ intensity: $(INTENSITY_OBJECTS)
 	$(NVCC) $(NVCCLIBS) $(INTENSITY_OBJECTS) -o $@
 # ===========================================================================
 
-
-
-
 # ===========================================================================
-CACHETEST_SOURCES = jeecachetest.cu cache_kernel.cu pm_lib_cuda.cu
+CACHETEST_SOURCES = jeecachetest.cu cache_kernel.cu 
 CACHETEST_OBJECTS = $(CACHETEST_SOURCES:.cu=.o)
 
 cachetest: $(CACHETEST_OBJECTS)
 	$(NVCC) $(NVCCLIBS) $(CACHETEST_OBJECTS) -o $@  
 # ===========================================================================
+
+
+
 
 # ===========================================================================
 SMTEST_SOURCES = jeesmtest.cu sm_kernel.cu pm_lib_cuda.cu
