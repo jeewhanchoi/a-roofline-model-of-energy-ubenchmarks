@@ -38,7 +38,7 @@ TARGETS += bandwidthIlp
 TARGETS += intensity
 TARGETS += cachetest
 TARGETS += smtest
-#TARGETS += gpurand
+TARGETS += gpurand
 
 
 # default data type is double-precision (double)
@@ -88,9 +88,6 @@ cachetest: $(CACHETEST_OBJECTS)
 	$(NVCC) $(NVCCLIBS) $(CACHETEST_OBJECTS) -o $@  
 # ===========================================================================
 
-
-
-
 # ===========================================================================
 SMTEST_SOURCES = jeesmtest.cu sm_kernel.cu 
 SMTEST_OBJECTS = $(SMTEST_SOURCES:.cu=.o)
@@ -100,11 +97,11 @@ smtest: $(SMTEST_OBJECTS)
 # ===========================================================================
 
 # ===========================================================================
-GPURANDTEST_SOURCES = jeerandmem.cu pm_lib_cuda.cu
+GPURANDTEST_SOURCES = jeerandmem.cu 
 GPURANDTEST_OBJECTS = $(GPURANDTEST_SOURCES:.cu=.o)
 
 gpurand: $(GPURANDTEST_OBJECTS)
-	$(NVCC) $(NVCCLIBS) $(GPURANDTEST_OBJECTS) -o $@ 
+	$(NVCC) $(NVCCLIBS) $(GPURANDTEST_OBJECTS) -o $@ -Xcompiler -fopenmp -lgomp
 # ===========================================================================
 
 
