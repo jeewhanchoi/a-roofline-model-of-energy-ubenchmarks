@@ -53,3 +53,14 @@ redundant computation.
 Cache benchmark
 	make cachetest
 %========================================
+
+%========================================
+	This benchmark tests the shared memory
+bandwidth for NVIDIA GPUs.
+	This benchmark uses a simple pointer chaser 
+to implement the memory reads to minimize 
+redundant computation.
+%========================================
+Shared memory benchmark
+	make smtest
+%========================================

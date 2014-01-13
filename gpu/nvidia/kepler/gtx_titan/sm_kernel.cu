@@ -1,5 +1,9 @@
 #include "common.h"
 
+#ifndef BLOCK_SIZE
+	#define BLOCK_SIZE 1024
+#endif
+
 __global__ void cache_kernel_1 (int nThreads, int* out, int* chase)
 {
 	int tmp;
