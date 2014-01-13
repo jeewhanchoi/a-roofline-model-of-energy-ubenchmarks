@@ -13,7 +13,7 @@ The list of target systems are
   Type Name         Done ubenchmark               To-do ubenchmark
 --------------------------------------------------------------------------
 1) CPU (Nehalem)    (DRAM/cache read/random,intensity)              (DONE)
-2) CPU (Ivy Bridge) (DRAM/cache read/random)   (intensity)
+2) CPU (Ivy Bridge) (DRAM/cache read/random,intensity)              (DONE)
 *3) GPU (HD4000)    ()                         (intensity)
 4) GPU (Fermi)      (intensity,comp,DRAM/cache/SM read,DRAM random) (DONE)
 5) GPU (Kepler)     (intensity,comp,DRAM/cache/SM read,DRAM random) (DONE)
