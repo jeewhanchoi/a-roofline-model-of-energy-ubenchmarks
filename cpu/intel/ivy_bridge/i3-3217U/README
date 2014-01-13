@@ -1,0 +1,23 @@
+How to compile:
+
+%========================================
+Intensity benchmark
+	Single:
+		make MAD_PER_ELEMENT=<M> TYPE=0
+	Double:
+		make MAD_PER_ELEMENT=<M> TYPE=1
+%========================================
+
+How to execute:
+./main
+
+
+1) The kernel issues  1 MUL followed by 1 ADD, M times using AVX instructions.
+
+2) Multicore execution is done using OpenMP.
+
+3) For a given M, the arithmetic intensity of this benchmark is different for single and double.
+Single
+	intensity = (M * 2 flops) / (4 bytes)
+Double
+	intensity = (M * 2 flops) / (8 bytes)

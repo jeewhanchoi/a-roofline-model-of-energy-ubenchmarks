@@ -48,15 +48,15 @@ int main(int argc, char** argv) {
 	const size_t array_length = 1024 * 1024 * 500;
 
 	/* Create and initialize arrays */	
-	double* data0 = (double*)memalign(64, array_length * sizeof(double));
-	double* data1 = (double*)memalign(64, array_length * sizeof(double));
-	memset(data0, 0, array_length * sizeof(double));
-	memset(data1, 0, array_length * sizeof(double));
+	double* data0 = (double*) memalign (64, array_length * sizeof (double));
+	double* data1 = (double*) memalign (64, array_length * sizeof (double));
+	memset (data0, 0, array_length * sizeof (double));
+	memset (data1, 0, array_length * sizeof (double));
 
 	/* Timers */	
 	double execTime0, execTime1;
 
-	/* Since the E2-1800 has 2 cores, we use OpenMP to run computation on both
+	/* Since the i3-3217U has 2 cores, we use OpenMP to run computation on both
 		 cores. 
 		 If the target processor has more cores, increase the number of data 
 		 structures, timers, OpenMP threads, etc. accordingly.
@@ -141,10 +141,10 @@ int main(int argc, char** argv) {
 
 	/* Print performance info */
 	fprintf (stderr, "Execution time 0: %lf\tExecution time 1: %lf\n", 
-					execTime0, execTime1);
+					 execTime0, execTime1);
 	fprintf (stderr, "Execution time: %lf\n", execTime);
 	fprintf (stderr, "GBytes: %5.03lf GFlops: %5.03lf\n", bytes/1.0e+9, 
-						flops/1.0e+9);
+					 flops/1.0e+9);
 	fprintf (stderr, "Bandwidth: %lf GB/s\n", bytes/execTime/1.0e+9);
 	fprintf (stderr, "Performance: %lf GFLOPS\n", flops/execTime/1.0e+9);
 
