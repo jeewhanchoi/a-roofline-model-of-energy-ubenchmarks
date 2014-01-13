@@ -24,8 +24,6 @@ Bandwidth benchmark
 
 
 %========================================
-	This benchmark has one (Double) or 
-two (Single) ILP per thread (Single).
 	It computes a sequence of FMA's over
 each word of data loaded to match the 
 input intensity I.

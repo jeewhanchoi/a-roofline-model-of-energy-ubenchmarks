@@ -22,6 +22,9 @@ Bandwidth benchmark
 
 
 %========================================
+	It computes a sequence of FMA's over
+each word of data loaded to match the 
+input intensity I.
 %========================================
 Intensity benchmark
 	Single:
