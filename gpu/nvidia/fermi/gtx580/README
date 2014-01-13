@@ -32,3 +32,16 @@ Intensity benchmark
 	Double:
 		make intensity TYPE=double
 %========================================
+
+
+%========================================
+	This benchmark tests the L1 cache
+bandwidth for Fermi GPUs.
+	This benchmark uses a simple pointer chaser 
+to implement the memory reads to minimize 
+redundant computation.
+%========================================
+Cache benchmark
+	make cachetest
+%========================================
+

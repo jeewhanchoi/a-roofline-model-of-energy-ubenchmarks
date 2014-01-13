@@ -52,6 +52,7 @@ Cache benchmark
 	make cachetest
 %========================================
 
+
 %========================================
 	This benchmark tests the shared memory
 bandwidth for NVIDIA GPUs.
@@ -62,6 +63,7 @@ redundant computation.
 Shared memory benchmark
 	make smtest
 %========================================
+
 
 %========================================
 	This benchmark tests the random memory
