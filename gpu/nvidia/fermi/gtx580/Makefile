@@ -37,7 +37,7 @@ TARGETS += compute
 TARGETS += bandwidthIlp
 TARGETS += intensity
 TARGETS += cachetest
-#TARGETS += smtest
+TARGETS += smtest
 #TARGETS += gpurand
 
 
@@ -92,7 +92,7 @@ cachetest: $(CACHETEST_OBJECTS)
 
 
 # ===========================================================================
-SMTEST_SOURCES = jeesmtest.cu sm_kernel.cu pm_lib_cuda.cu
+SMTEST_SOURCES = jeesmtest.cu sm_kernel.cu 
 SMTEST_OBJECTS = $(SMTEST_SOURCES:.cu=.o)
 
 smtest: $(SMTEST_OBJECTS)
