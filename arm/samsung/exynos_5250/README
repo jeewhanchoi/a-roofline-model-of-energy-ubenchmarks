@@ -1,0 +1,23 @@
+How to compile:
+
+%========================================
+Intensity benchmark
+	Single:
+		make MLA_PER_DOUBLE=0 MLA_PER_FLOAT=<M>
+	Double:
+		make MLA_PER_DOUBLE=<M> MLA_PER_FLOAT=0
+%========================================
+
+How to execute:
+./main
+
+
+1) The kernel issues 1 VMFA (2 flops), M times per data element.
+
+2) Multicore execution is done using OpenMP.
+
+3) For a given M, the arithmetic intensity of this benchmark is different for single and double.
+Single
+	intensity = (M * 2 flops) / (4 bytes)
+Double
+	intensity = (M * 2 flops) / (8 bytes)
