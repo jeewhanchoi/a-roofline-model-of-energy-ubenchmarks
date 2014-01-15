@@ -16,7 +16,7 @@ The list of target systems are
 2) CPU (Ivy Bridge) (DRAM/cache read/random,intensity)              (DONE)
 3) GPU (Fermi)      (intensity,comp,DRAM/cache/SM read,DRAM random) (DONE)
 4) GPU (Kepler)     (intensity,comp,DRAM/cache/SM read,DRAM random) (DONE)
-5) ARM (Cortex A9)  (DRAM/cache read/random)   (intensity)
+5) ARM (Cortex A9)  (DRAM/cache read/random,intensity)              (DONE)
 6) ARM (Cortex A15) (DRAM/cache read/random,intensity)              (DONE)
 7) GPU (Mali T604)  ()                         (intensity,cache/DRAM/rand read)
 8) CPU (AMD APU)    (intensity,DRAM/cache read/random)              (DONE)
