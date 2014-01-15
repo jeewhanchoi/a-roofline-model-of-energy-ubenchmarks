@@ -18,11 +18,8 @@ The list of target systems are
 4) GPU (Kepler)     (intensity,comp,DRAM/cache/SM read,DRAM random) (DONE)
 5) ARM (Cortex A9)  (DRAM/cache read/random,intensity)              (DONE)
 6) ARM (Cortex A15) (DRAM/cache read/random,intensity)              (DONE)
-7) GPU (Mali T604)  ()                         (intensity,cache/DRAM/rand read)
+7) GPU (Mali T604)  (intensity,DRAM rand)         (cache read)
 8) CPU (AMD APU)    (intensity,DRAM/cache read/random)              (DONE)
 9) GPU (Radeon)     (intensity,cache read,DRAM random)              (DONE)
 10) Xeon Phi        (DRA/cache read/random,intensity)               (DONE)
-*11) GPU (HD4000)   ()                         (intensity)
 --------------------------------------------------------------------------
-* Not tested properly and may not be included in the final version. 
-  This is mainly due to the Windows OpenCL driver not working properly.
