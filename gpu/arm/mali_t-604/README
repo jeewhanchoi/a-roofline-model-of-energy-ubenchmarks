@@ -1,0 +1,15 @@
+How to compile:
+
+%========================================
+1) First copy the relevant .mk file
+	E.g., cp Android.mk.l1 Android.mk to build the L1 cache benchmark
+2) Then type ndk-build
+%========================================
+
+How to execute:
+./cl<cache,bench,random>
+
+
+1) There are two cache benchmarks: cache.cpp and l1.cpp.
+l1.cpp uses the cache, whereas cache.cpp uses local(shared) memory.
+You should use l1.cpp for Mali T-604 since it does not have local memory.
