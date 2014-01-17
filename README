@@ -21,5 +21,7 @@ The list of target systems are
 7) GPU (Mali T604)  (intensity,DRAM rand,cache read)                (DONE)
 8) CPU (AMD APU)    (intensity,DRAM/cache read/random)              (DONE)
 9) GPU (Radeon)     (intensity,cache read,DRAM random)              (DONE)
-10) Xeon Phi        (DRA/cache read/random,intensity)               (DONE)
+10) Xeon Phi        (DRAM/cache read/random,intensity)               (DONE)
 --------------------------------------------------------------------------
+
+The DRAM/cache read, random access benchmarks for ARM, x86, and Phis are located under ./generic/
