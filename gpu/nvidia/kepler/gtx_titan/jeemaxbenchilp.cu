@@ -78,9 +78,30 @@ float executeKernel(int num_blocks, int bSize, int nThreads, int nStreams,
 			intensity_kernel_1_2 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
+		case 3:
+			/* intensity 0.75 */
+			intensity_kernel_1_3 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+
 		case 4:
 			/* intensity 1.0 */
 			intensity_kernel_1_4 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 5:
+			/* intensity 1.25 */
+			intensity_kernel_1_5 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 6:
+			/* intensity 1.5 */
+			intensity_kernel_1_6 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 7:
+			/* intensity 1.75 */
+			intensity_kernel_1_7 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
 		case 8:
@@ -88,9 +109,39 @@ float executeKernel(int num_blocks, int bSize, int nThreads, int nStreams,
 			intensity_kernel_1_8 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
+		case 10:
+			/* intensity 2.5 */
+			intensity_kernel_1_10 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 12:
+			/* intensity 3.0 */
+			intensity_kernel_1_12 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 14:
+			/* intensity 3.5 */
+			intensity_kernel_1_14 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
 		case 16:
 			/* intensity 4.0 */
 			intensity_kernel_1_16 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 20:
+			/* intensity 5.0 */
+			intensity_kernel_1_20 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 24:
+			/* intensity 6.0 */
+			intensity_kernel_1_24 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 28:
+			/* intensity 7.0 */
+			intensity_kernel_1_28 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
 		case 32:
@@ -98,9 +149,29 @@ float executeKernel(int num_blocks, int bSize, int nThreads, int nStreams,
 			intensity_kernel_1_32 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
+		case 40:
+			/* intensity 10.0 */
+			intensity_kernel_1_40 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 48:
+			/* intensity 12.0 */
+			intensity_kernel_1_48 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 56:
+			/* intensity 14.0 */
+			intensity_kernel_1_56 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
 		case 64:
 			/* intensity 16.0 */
 			intensity_kernel_1_64 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+		case 72:
+			/* intensity 18.0 */
+			intensity_kernel_1_72 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
 		case 128:
@@ -108,6 +179,12 @@ float executeKernel(int num_blocks, int bSize, int nThreads, int nStreams,
 			intensity_kernel_1_128 <<<grid, threads>>> (nThreads, nStreams,
 		                                            d_in, d_out);
 			break;
+		case 160:
+			/* intensity 40.0 */
+			intensity_kernel_1_160 <<<grid, threads>>> (nThreads, nStreams,
+		                                            d_in, d_out);
+			break;
+
 		case 256:
 			/* intensity 64.0 */
 			intensity_kernel_1_256 <<<grid, threads>>> (nThreads, nStreams,
